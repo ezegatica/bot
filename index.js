@@ -1,6 +1,7 @@
 const keep_alive = require('./keep_alive.js')
 const Discord = require('discord.js')
 const client = new Discord.Client()
+const weather = require('weather-js');
 var veces = 0;
 const PREFIX = '!';
 
@@ -92,13 +93,40 @@ client.on("message", async message => {
     break;
 
     case 'clima':
-        message.channel.send("**Comando en preparacion!**")
+      console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n'); 
+      // message.channel.send("**Comando en preparacion!**");
+        weather.find({search: args.join(" "), degreeType: 'C'}, function(err, result){
+        if (err) message.channel.send(err);
+        if (result.length === 0){
+          message.channel.send("Por favor, "+ message.author.username + ", ingrese una ubicacion correcta.");
+          return;
+        }
+       console.log(JSON.stringify(result[0].current, null, 2));
+
+        var current = result[0].current;
+        var location = result[0].location;
+        const climaembed = new Discord.MessageEmbed()
+        .setTitle("Clima")
+        .setURL("https://www.npmjs.com/package/weather-js")
+        .setDescription('Clima de '+ current.observationpoint)
+        // .setAuthor("API Utilizada", "", "https://www.npmjs.com/package/weather-js")
+        .setThumbnail(current.imageUrl)
+        .setColor("#f05514")
+        .addField('Timezone', "UTC " + location.timezone, true)
+        .addField("Clima:", current.skytext, true)  
+        .addField("Vientos", current.winddisplay, true)
+        .addField('Temperatura', current.temperature + "°" + location.degreetype, true)
+        .addField("Sensacion Termica", current.feelslike + "°" + location.degreetype, true )
+        .addField("Humedad", current.humidity + "%", true)
+        message.channel.send(climaembed)
+        })
 
     break;
 
 
     case 'codigo':
-        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n');       message.author.send("Codigo fuente del bot: https://repl.it/@gati/bot")
+        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n');       
+        message.author.send("Codigo fuente del bot: https://repl.it/@gati/bot")
         message.channel.send("Ahi te lo envie por privado, crack")
 
     break;
