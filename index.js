@@ -6,9 +6,8 @@ const PREFIX = '!';
 
 // BEGIN LOGIN \\
 const TOKEN = process.env.TOKENN
-client.on('ready', () => {
-    console.log(client.user.username + ' prendido!')
-        console.log()
+client.on('ready', async () => {
+    console.log(client.user.username + ' prendido! \n')
     client.user.setActivity("!ayuda para ver los comandos disponibles!");
 })
 
@@ -38,8 +37,7 @@ client.on("message", async message => {
      switch(message.content.toLowerCase()){
 
   case 'ping':
-          console.log(message.member.user.tag + ' >> ' + message.content)
-
+    console.log(message.member.user.tag + ' >> ' + message.content)
     const m = await message.channel.send("Calculando");
     m.edit(`Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms.`)
   break;
@@ -70,13 +68,13 @@ client.on("message", async message => {
     // break;
 
     case 'ayuda':
-        console.log(message.member.user.tag + ' >> ' + message.content)
+        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n')
         const exampleEmbed = new Discord.MessageEmbed()
         .setColor('#141821')
           .setTitle('Gati-Bot')
           .setURL('https://gati.ga/')
           .setAuthor('by: Gati#2615', 'https://cdn.discordapp.com/icons/410136533883027457/cfe8d9ea29ac685754220e83bde0b266.png', 'https://discord.gg/cRnJZCj')
-          .setDescription('Ayuda con comandos!')
+          // .setDescription('Ayuda con comandos!')
           
           .setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/VisualEditor_-_Icon_-_Help.svg/1024px-VisualEditor_-_Icon_-_Help.svg.png')
           .addFields(
@@ -87,26 +85,30 @@ client.on("message", async message => {
           )
           
           .setTimestamp()
-          .setFooter('Gati-Bot#7763', 'https://cdn.discordapp.com/avatars/696557662447599706/a24a222ac2bcf2aa45bc91507926c1b7.png');
+          .setFooter('Made with love, by Gati', 'https://1.bp.blogspot.com/-44b7Xv4InJ4/T3MWo-ZkR2I/AAAAAAAACao/m7gU8rwq9TU/s1600/Ronda_Heart7.png');
 
         message.channel.send(exampleEmbed);
 
     break;
 
+    case 'clima':
+        message.channel.send("**Comando en preparacion!**")
+
+    break;
+
+
     case 'codigo':
-        console.log(message.member.user.tag + ' >> ' + message.content)
-        message.channel.send("Codigo fuente del bot: https://repl.it/@gati/bot")
+        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n');       message.author.send("Codigo fuente del bot: https://repl.it/@gati/bot")
+        message.channel.send("Ahi te lo envie por privado, crack")
 
     break;
     case 'test':
-        console.log(message.member.user.tag + ' >> ' + message.content)
-        message.channel.send("!test")
+        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n');          message.channel.send("!test")
 
     break;
 
     case 'start':
-            console.log(message.member.user.tag + ' >> ' + message.content)
-            message.channel.send('>>> **Chancellor Palpatine**: Did you ever hear the tragedy of Darth Plagueis The Wise?');
+        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n');              message.channel.send('>>> **Chancellor Palpatine**: Did you ever hear the tragedy of Darth Plagueis The Wise?');
             veces = 0;  
             console.log('Colector on!')
 
@@ -120,8 +122,7 @@ client.on("message", async message => {
     break;
 
     case 'forcekick':
-        console.log(message.member.user.tag + ' >> ' + message.content)
-
+        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n');  
         if(message.member.user == 285156007385235467){ //ahi va el user id del "admin", te salteas la votacion
           if(message.member.voice.channel){
           if (message.mentions.members.first()){
@@ -144,8 +145,7 @@ client.on("message", async message => {
 
 
     case 'kick':
-          console.log(message.member.user.tag + ' >> ' + message.content)
-          if(message.member.voice.channel){
+        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n');            if(message.member.voice.channel){
               const filter = (reaction, user) => {
               return reaction.emoji.name === '👌' && user.id !== client.user.id;};
               let cantidad = message.member.voice.channel.members.size;
@@ -173,7 +173,7 @@ client.on("message", async message => {
     break;
 
     case 'spam':
-          console.log(message.member.user.tag + ' >> ' + message.content)
+        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n');
           if(message.member.user == 285156007385235467){ //ahi va el user id del "admin", te salteas la votacion
           if (message.mentions.members.first()){
           if(message.mentions.members.first().voice.channel){
@@ -215,30 +215,25 @@ client.on('message', message=>{
    switch(message.content.toLowerCase()){
 
     case 'lorem':
-        console.log(message.member.user.tag + ' >> ' + message.content)
-        message.channel.send("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vitae sapien arcu. Vivamus faucibus placerat eros eget viverra. Aenean ultrices luctus imperdiet. Quisque finibus nibh in pretium accumsan. Morbi mattis sagittis lectus, ut dictum nulla dignissim at. Maecenas nec vehicula nisl, eu molestie diam. Suspendisse viverra sodales hendrerit. Donec congue felis nec nisl sollicitudin accumsan. Fusce luctus facilisis sodales.")
+        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n');        message.channel.send("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vitae sapien arcu. Vivamus faucibus placerat eros eget viverra. Aenean ultrices luctus imperdiet. Quisque finibus nibh in pretium accumsan. Morbi mattis sagittis lectus, ut dictum nulla dignissim at. Maecenas nec vehicula nisl, eu molestie diam. Suspendisse viverra sodales hendrerit. Donec congue felis nec nisl sollicitudin accumsan. Fusce luctus facilisis sodales.")
     break;
 
 
     case 'test':
-        console.log(message.member.user.tag + ' >> ' + message.content)
-        message.channel.send("test")
+        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n');        message.channel.send("test")
     break;
 
 
     case 'hola':
-        console.log(message.member.user.tag + ' >> ' + message.content)
-        message.channel.send("HOLA REY")
+        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n');        message.channel.send("HOLA REY")
     break;
 
     case 'chau':
-        console.log(message.member.user.tag + ' >> ' + message.content)
-        message.channel.send("CHAU KINGA")
+        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n');        message.channel.send("CHAU KINGA")
     break;
     
     case 'nigga':
-    console.log(message.member.user.tag + ' >> ' + message.content)
-    message.reply('NO DALE NO DIGAS ESO')
+        console.log(message.member.user.tag + ' >> ' + message.guild.name + ' >> ' + message.channel.name + ' >> \n' +message.content +'\n');    message.reply('NO DALE NO DIGAS ESO')
     break;
 
 }}}})
