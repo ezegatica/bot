@@ -1,1 +1,1 @@
-En el archivo "env", renombrarlo a ".env", insertar el Token Secreto del bot, y el bot empezara a funcionar!
+  En el archivo "env", renombrarlo a ".env", insertar el Token Secreto del bot, y el bot empezara a funcionar!

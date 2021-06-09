@@ -1,5 +1,9 @@
-arreglar el clima, fijarse si se puede traducir y cambiar la ubicacion con el skytext.
-
 ver si se puede agregar el modulo de musica
 
-agregar el clima al !ayuda
+
+
+
+
+agregar el clima al !ayuda [done]
+
+arreglar el clima, fijarse si se puede traducir y cambiar la ubicacion con el skytext.[done]
