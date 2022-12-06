@@ -1,19 +1,22 @@
 {
   "name": "@gati/bot",
   "version": "1.0.0",
+  "author": "Ezequiel Gatica",
+  "license": "ISC",
   "description": "Discord bot",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "prebuild": "rimraf dist",
     "start": "node dist/index.js",
+    "prestart": "node dist/rest.js",
     "dev": "nodemon --exec ts-node src/index.ts",
+    "update": "ts-node src/rest.ts",
     "lint:eslint": "eslint \"src/**/*.ts\" --fix",
     "lint:prettier": "prettier . --write"
   },
-  "author": "Ezequiel Gatica",
-  "license": "ISC",
   "devDependencies": {
+    "@types/node": "^18.11.11",
     "@typescript-eslint/eslint-plugin": "^5.45.1",
     "@typescript-eslint/parser": "^5.45.1",
     "eslint": "^8.29.0",
@@ -28,6 +31,7 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
+    "chalk": "4.1.2",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3"
   }

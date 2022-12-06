@@ -1,10 +1,19 @@
 import { REST, Routes } from 'discord.js';
-import config from './config';
+import config, { Commands } from './config';
+import Logger from './logger';
 
 const commands = [
   {
-    name: 'ping',
+    name: Commands.Ping,
     description: 'Replies with Pong!'
+  },
+  {
+    name: Commands.Ayuda,
+    description: 'Responde con la lista de comandos disponibles!'
+  },
+  {
+    name: Commands.Gati,
+    description: '2nd command test!'
   }
 ];
 
@@ -12,14 +21,14 @@ const rest = new REST({ version: '10' }).setToken(config.TOKEN);
 
 (async () => {
   try {
-    console.info('Started refreshing application (/) commands.');
+    Logger.info('Started refreshing application (/) commands.');
 
     await rest.put(Routes.applicationCommands(config.CLIENT_ID), {
       body: commands
     });
 
-    console.info('Successfully reloaded application (/) commands.');
-  } catch (error) {
-    console.error(error);
+    Logger.info('Successfully reloaded application (/) commands.');
+  } catch (error: any) {
+    Logger.error(error.message);
   }
 })();
