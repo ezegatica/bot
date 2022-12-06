@@ -25,24 +25,14 @@ const commands = [
         type: 1
       },
       {
+        name: 'frase',
+        description: 'Envia una frase de los simpsons (alias --random)',
+        type: 1
+      },
+      {
         name: 'surgerir',
         description: '¿Queres sugerir una frase?',
         type: 1
-        // required: false,
-        // options: [
-        //   {
-        //     name: 'frase',
-        //     description: 'Frase a sugerir',
-        //     type: 3,
-        //     required: true
-        //   },
-        //   {
-        //     name: 'autor',
-        //     description: 'Autor de la frase',
-        //     type: 3,
-        //     required: true
-        //   }
-        // ]
       }
     ]
   },

@@ -59,7 +59,8 @@ client.on('interactionCreate', async interaction => {
   if (interaction.commandName === Commands.Simpsons) {
     if (interaction.options.getSubcommand() === 'surgerir') {
       await interaction.reply({
-        content: 'Gracias por la sugerencia! Por favor, agregala aqui:',
+        content:
+          'Gracias por la sugerencia! Por favor, agregala aqui:\nhttps://github.com/ezegatica/bot/edit/main/src/commands/simpsons.ts',
         ephemeral: true
       });
       return;
