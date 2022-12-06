@@ -78,9 +78,13 @@ client.on('interactionCreate', async interaction => {
       embeds: [
         {
           author: {
-            name: 'by: Gati#2615'
+            name: 'by: Gati#2615',
+            icon_url:
+              'https://gatica.sirv.com/public/Mapache%20Mundialista%20(1).png',
+            url: 'https://ezegatica.com'
           },
-          color: 141821,
+          color: 1316897, // #141821 from hex to int
+          description: 'Lista de comandos disponibles',
           title: 'Gati-bot',
           fields: [
             {
@@ -94,8 +98,8 @@ client.on('interactionCreate', async interaction => {
               inline: true
             },
             {
-              name: '/opino',
-              value: 'Opina sobre vos',
+              name: '/simpsons frase',
+              value: 'Tira una frase random de Los Simpsons',
               inline: true
             }
           ],
