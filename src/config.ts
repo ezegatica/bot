@@ -10,7 +10,10 @@ export const config = {
 export enum Commands {
   Ping = 'ping',
   Ayuda = 'ayuda',
-  Gati = 'gati'
+  Gati = 'gati',
+  Simpsons = 'simpsons',
+  Codigo = 'codigo',
+  Clear = 'clear'
 }
 
 export default config;

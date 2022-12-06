@@ -1,4 +1,5 @@
 import { Client, GatewayIntentBits } from 'discord.js';
+import MensajesSimpsons from './commands/simpsons';
 import config, { Commands } from './config';
 import Logger from './logger';
 
@@ -11,14 +12,64 @@ client.on('ready', () => {
 
 client.on('interactionCreate', async interaction => {
   if (!interaction.isChatInputCommand()) return;
-  Logger.message(interaction.user.tag, interaction.commandName);
+  Logger.message(
+    interaction.user.tag,
+    `${interaction.commandName} ${interaction.options.data
+      .map(
+        option =>
+          `(${option.name}:${
+            option.options
+              ? option.options
+                  .map(ops => `[${ops.name}:${ops.value}]`)
+                  .join(', ')
+              : option.value
+          })`
+      )
+      .join(', ')}`
+  );
 
   if (interaction.commandName === Commands.Ping) {
-    await interaction.reply('Pong!');
+    await interaction.reply({
+      content: 'Pong',
+      ephemeral: true
+    });
   }
 
   if (interaction.commandName === Commands.Gati) {
     await interaction.reply('2nd command test!');
+  }
+
+  if (interaction.commandName === Commands.Codigo) {
+    await interaction.reply({
+      content:
+        'Chequea el codigo fuente acá!\nhttps://github.com/ezegatica/bot',
+      ephemeral: true
+    });
+  }
+
+  if (interaction.commandName === Commands.Clear) {
+    const amount = interaction.options.getInteger('amount');
+    await interaction.deferReply({ ephemeral: true });
+    await interaction.channel.bulkDelete(amount);
+    await interaction.editReply({
+      content: `Se eliminaron ${amount} mensajes!`
+    });
+  }
+
+  if (interaction.commandName === Commands.Simpsons) {
+    if (interaction.options.getSubcommand() === 'surgerir') {
+      await interaction.reply({
+        content: 'Gracias por la sugerencia! Por favor, agregala aqui:',
+        ephemeral: true
+      });
+      return;
+    }
+    const messages = MensajesSimpsons;
+    const randomNumber = Math.floor(Math.random() * messages.length);
+    const randomMessage = messages[randomNumber];
+    await interaction.reply(
+      `> ${randomMessage.quote}\n- ${randomMessage.author}`
+    );
   }
 
   if (interaction.commandName === Commands.Ayuda) {
@@ -37,13 +88,13 @@ client.on('interactionCreate', async interaction => {
               inline: true
             },
             {
-              name: '/opino',
-              value: 'Opina sobre vos',
+              name: '/codigo',
+              value: 'Te muestro el codigo fuente del bot',
               inline: true
             },
             {
-              name: '!punteo',
-              value: 'Te punteo',
+              name: '/opino',
+              value: 'Opina sobre vos',
               inline: true
             }
           ],
@@ -53,7 +104,8 @@ client.on('interactionCreate', async interaction => {
               'https://1.bp.blogspot.com/-44b7Xv4InJ4/T3MWo-ZkR2I/AAAAAAAACao/m7gU8rwq9TU/s1600/Ronda_Heart7.png'
           }
         }
-      ]
+      ],
+      ephemeral: true
     });
   }
 });
