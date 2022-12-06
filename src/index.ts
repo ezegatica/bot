@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import MensajesSimpsons from './commands/simpsons';
 import config, { Commands } from './config';
 import Logger from './logger';
+import './keep_alive';
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
