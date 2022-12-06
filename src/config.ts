@@ -1,4 +1,11 @@
-export const config = {
-    token: process.env.TOKEN,
-    client_id: process.env.CLIENT_ID
-}
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const config = {
+  TOKEN: process.env.TOKEN,
+  CLIENT_ID: process.env.CLIENT_ID
+};
+
+export default config;
+export { config };
