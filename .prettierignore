@@ -1,0 +1,8 @@
+# General prettier ignore
+./node_modules
+dist
+.yarn
+.husky
+*.md
+*.json
+*.yml
