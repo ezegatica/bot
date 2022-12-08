@@ -15,16 +15,17 @@ client.on('interactionCreate', async interaction => {
   if (!interaction.isChatInputCommand()) return;
   Logger.message(
     interaction.user.tag,
+    interaction.guild.name,
     `${interaction.commandName} ${interaction.options.data
       .map(
         option =>
-          `(${option.name}:${
+          `[${option.name}:${
             option.options
               ? option.options
-                  .map(ops => `[${ops.name}:${ops.value}]`)
+                  .map(ops => `{${ops.name}:${ops.value}}`)
                   .join(', ')
               : option.value
-          })`
+          }]`
       )
       .join(', ')}`
   );

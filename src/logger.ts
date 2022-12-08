@@ -12,8 +12,12 @@ const debug2 = (title: string, msg: string): void => {
   );
 };
 
-const message = (user: string, msg: string): void => {
-  console.info(`${chalk.bold('➤')} ${chalk.blue(user)}: ${msg}`);
+const message = (user: string, server: string, msg: string): void => {
+  console.info(
+    `${chalk.green.bold('➤')} ${chalk.blue(user)} (${chalk.grey(
+      server
+    )}): /${msg}`
+  );
 };
 
 const info = (msg: string): void => {
