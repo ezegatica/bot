@@ -25,11 +25,6 @@ const commands = [
         type: 1
       },
       {
-        name: 'frase',
-        description: 'Envia una frase de los simpsons (alias --random)',
-        type: 1
-      },
-      {
         name: 'surgerir',
         description: '¿Queres sugerir una frase?',
         type: 1
@@ -51,10 +46,6 @@ const commands = [
       }
     ],
     default_membdeer_permissions: 32 + 16 + 8192
-  },
-  {
-    name: Commands.Gati,
-    description: 'Quick access command!'
   }
 ];
 

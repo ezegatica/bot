@@ -36,10 +36,6 @@ client.on('interactionCreate', async interaction => {
     });
   }
 
-  if (interaction.commandName === Commands.Gati) {
-    await interaction.reply('2nd command test!');
-  }
-
   if (interaction.commandName === Commands.Codigo) {
     await interaction.reply({
       content:

@@ -1,4 +1,4 @@
-name: '🛠 Update Slash commands'
+name: '🛠 Shipper'
 
 on:
   push:
@@ -14,8 +14,9 @@ jobs:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js 16
+    - name: 'Setup Checkout'
+      uses: actions/checkout@v3
+    - name: 'Setup Node.js 16'
       uses: actions/setup-node@v3
       with:
         node-version: '16'
