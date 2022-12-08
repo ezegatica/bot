@@ -1,18 +1,21 @@
-name: '🛠 Shipper'
+name: '📝 Register Slash commands'
 
 on:
-  push:
-    branches: [ "main" ]
+  workflow_call:
+    secrets:
+      CLIENT_ID:
+        required: true
+      TOKEN:
+        required: true
 
 jobs:
-  build:
+  deploy:
     timeout-minutes: 5
-    name: '📝 Register Slash commands'
     runs-on: ubuntu-latest
-    env:
-      TOKEN: ${{ secrets.TOKEN }}
+    name: '📝 Update commands'
+    env: 
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
-
+      TOKEN: ${{ secrets.TOKEN }}
     steps:
     - name: 'Setup Checkout'
       uses: actions/checkout@v3
@@ -41,13 +44,3 @@ jobs:
         path: |
           dist
           package.json
-
-  call-deploy:
-    name: "📡 Deploy workflow"
-    needs: build
-    uses: ezegatica/bot/.github/workflows/deploy.yml@main
-    with:
-      artifact-name: production-${{ github.sha }}
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
-      CLIENT_ID: ${{ secrets.CLIENT_ID }}

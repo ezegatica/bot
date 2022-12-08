@@ -1,0 +1,31 @@
+name: '🛠 Worker'
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: "📡 Register"
+    uses: ezegatica/bot/.github/workflows/update-commands.yml@main
+    secrets:
+      TOKEN: ${{ secrets.TOKEN }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+
+  call-deploy:
+    name: "📡 Deploy"
+    needs: build
+    uses: ezegatica/bot/.github/workflows/deploy.yml@main
+    with:
+      artifact-name: production-${{ github.sha }}
+    secrets:
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+  
+  call-swap:
+    name: "📡 Swap"
+    needs: ['build', 'call-deploy']
+    uses: ezegatica/bot/.github/workflows/swap-instances.yml@main
+    secrets:
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}

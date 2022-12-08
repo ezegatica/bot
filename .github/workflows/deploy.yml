@@ -7,18 +7,15 @@ on:
         required: true
         type: string
     secrets:
-      TOKEN:
+      EC2_HOST:
         required: true
-      CLIENT_ID:
+      EC2_SSH_KEY:
         required: true
 
 jobs:
   deploy:
     timeout-minutes: 5
     name: '🚀 Deploy to AWS'
-    env:
-      TOKEN: ${{ secrets.TOKEN }}
-      CLIENT_ID: ${{ secrets.CLIENT_ID }}
 
     runs-on: ubuntu-latest
     steps:
@@ -27,18 +24,14 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: ${{ inputs.artifact-name }}
-    - name: Use Node.js 16
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-        cache: 'yarn'
-    - name: Install the dependencies
-      uses: Borales/actions-yarn@v4
-      with:
-        cmd: install
-    - name: (TESTING) Update the slash commands
-      uses: Borales/actions-yarn@v4
-      with:
-        cmd: register
+    - name: Deploy to the server
+      uses: easingthemes/ssh-deploy@main
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+        ARGS: "-rltgoDzvO -avzr --delete"
+        REMOTE_HOST: ${{ secrets.EC2_HOST }}
+        REMOTE_USER: ec2-user
+        TARGET: '/home/ec2-user/bot-cicd'
+        EXCLUDE: "node_modules"
 
    

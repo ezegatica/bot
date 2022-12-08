@@ -8,7 +8,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.on('ready', () => {
   Logger.done(`Logged in as ${client.user.tag}!`);
-  client.user.setActivity('!ayuda para ver los comandos disponibles!');
+  client.user.setActivity('/ayuda para ver los comandos disponibles!');
 });
 
 client.on('interactionCreate', async interaction => {

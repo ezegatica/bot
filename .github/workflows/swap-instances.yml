@@ -1,0 +1,31 @@
+name: "🔄 Swap instances"
+
+on:
+  workflow_call:
+    secrets:
+      EC2_HOST:
+        required: true
+      EC2_SSH_KEY:
+        required: true
+
+jobs:
+  deploy:
+    timeout-minutes: 5
+    name: "🔄 Swap instances"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Run deploy script
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        username: ec2-user
+        script: |
+          cp /home/ec2-user/.env /home/ec2-user/bot-cicd/.env
+          screen -S discord -X quit
+          screen -dmS discord
+          screen -S discord -X stuff "cd /home/ec2-user/bot-cicd
+          yarn install --frozen-lockfile --production
+          yarn start
+          "
+             
