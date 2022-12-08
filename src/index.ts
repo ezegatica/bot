@@ -32,7 +32,7 @@ client.on('interactionCreate', async interaction => {
 
   if (interaction.commandName === Commands.Ping) {
     await interaction.reply({
-      content: 'Pong',
+      content: 'Pong!',
       ephemeral: true
     });
   }
