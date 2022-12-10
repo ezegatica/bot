@@ -3,7 +3,6 @@ import fs from 'fs';
 import path from 'path';
 import config from './config';
 import Logger from './logger';
-import './keep_alive';
 import { Command } from './utils/types';
 
 const client: Client<boolean> & {
