@@ -21,7 +21,7 @@ const message = (user: string, server: string, msg: string): void => {
 };
 
 const info = (msg: string): void => {
-  console.info(`${chalk.blue.bold('!')} ${chalk.italic(msg)}`);
+  console.info(`${chalk.blue.bold('!')} ${chalk.cyanBright(msg)}`);
 };
 
 const question = (msg: string): void => {

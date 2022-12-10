@@ -1,14 +1,33 @@
-import { Client, GatewayIntentBits } from 'discord.js';
-import MensajesSimpsons from './commands/simpsons';
-import config, { Commands } from './config';
+import { Client, Collection, GatewayIntentBits } from 'discord.js';
+import fs from 'fs';
+import path from 'path';
+import config from './config';
 import Logger from './logger';
 import './keep_alive';
+import { Command } from './utils/types';
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client: Client<boolean> & {
+  commands?: Collection<string, Command>;
+} = new Client({
+  intents: [GatewayIntentBits.Guilds]
+});
+client.commands = new Collection<string, Command>();
 
-client.on('ready', () => {
+client.on('ready', async () => {
+  // Cargar comandos
+  const commandsPath = path.join(__dirname, 'commands');
+  const commandFiles = fs.readdirSync(commandsPath);
+
+  for (const file of commandFiles) {
+    const filePath = path.join(commandsPath, file);
+    const command = (await import(filePath)) as Command;
+    client.commands.set(command.data.name, command);
+  }
+
+  // Iniciar bot
   Logger.done(`Logged in as ${client.user.tag}!`);
   client.user.setActivity('/ayuda para ver los comandos disponibles!');
+  Logger.done(`${client.commands.size} comandos cargados!`);
 });
 
 client.on('interactionCreate', async interaction => {
@@ -29,85 +48,19 @@ client.on('interactionCreate', async interaction => {
       )
       .join(', ')}`
   );
+  // Correr comandos
+  const command = client.commands.get(interaction.commandName);
 
-  if (interaction.commandName === Commands.Ping) {
-    await interaction.reply({
-      content: 'Pong!',
-      ephemeral: true
-    });
-  }
+  if (!command) return;
 
-  if (interaction.commandName === Commands.Codigo) {
+  try {
+    await command.execute(interaction);
+  } catch (error: any) {
+    Logger.error(error.message);
+    console.error(error.stack);
     await interaction.reply({
       content:
-        'Chequea el codigo fuente acá!\nhttps://github.com/ezegatica/bot',
-      ephemeral: true
-    });
-  }
-
-  if (interaction.commandName === Commands.Clear) {
-    const amount = interaction.options.getInteger('amount');
-    await interaction.deferReply({ ephemeral: true });
-    await interaction.channel.bulkDelete(amount);
-    await interaction.editReply({
-      content: `Se eliminaron ${amount} mensajes!`
-    });
-  }
-
-  if (interaction.commandName === Commands.Simpsons) {
-    if (interaction.options.getSubcommand() === 'surgerir') {
-      await interaction.reply({
-        content:
-          'Gracias por la sugerencia! Por favor, agregala aqui:\nhttps://github.com/ezegatica/bot/edit/main/src/commands/simpsons.ts',
-        ephemeral: true
-      });
-      return;
-    }
-    const messages = MensajesSimpsons;
-    const randomNumber = Math.floor(Math.random() * messages.length);
-    const randomMessage = messages[randomNumber];
-    await interaction.reply(
-      `> ${randomMessage.quote}\n- ${randomMessage.author}`
-    );
-  }
-
-  if (interaction.commandName === Commands.Ayuda) {
-    await interaction.reply({
-      embeds: [
-        {
-          author: {
-            name: 'by: Gati#2615',
-            icon_url:
-              'https://gatica.sirv.com/public/Mapache%20Mundialista%20(1).png',
-            url: 'https://ezegatica.com'
-          },
-          color: 1316897, // #141821 from hex to int
-          description: 'Lista de comandos disponibles',
-          title: 'Gati-bot',
-          fields: [
-            {
-              name: '/ping',
-              value: 'Revisa el ping que esta teniendo el bot actualmente',
-              inline: true
-            },
-            {
-              name: '/codigo',
-              value: 'Te muestro el codigo fuente del bot',
-              inline: true
-            },
-            {
-              name: '/simpsons frase',
-              value: 'Tira una frase random de Los Simpsons',
-              inline: true
-            }
-          ],
-          footer: {
-            text: 'Made with love, by Gati',
-            icon_url:
-              'https://1.bp.blogspot.com/-44b7Xv4InJ4/T3MWo-ZkR2I/AAAAAAAACao/m7gU8rwq9TU/s1600/Ronda_Heart7.png'
-          }
-        }
-      ],
+        'Hubo un error al ejecutar el comando!\nPor favor, intenta de nuevo. Si el error persiste, contacta a Gati#2615',
       ephemeral: true
     });
   }
