@@ -5,7 +5,8 @@ import Logger from './logger';
 const commands = [
   {
     name: Commands.Ping,
-    description: 'Replies with Pong!'
+    description: 'Replies with Pong!',
+    default_member_permissions: 0
   },
   {
     name: Commands.Ayuda,
@@ -45,7 +46,7 @@ const commands = [
         max_value: 100
       }
     ],
-    default_membdeer_permissions: 32 + 16 + 8192
+    default_member_permissions: 32 + 16 + 8192
   }
 ];
 
