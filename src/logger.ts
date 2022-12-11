@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { ChatInputCommandInteraction } from 'discord.js';
 
 const debug = (msg: string): void => {
   console.debug(`${chalk.bgCyan.white.bold(' DEBUG ')} ${chalk.cyan(msg)}`);
@@ -12,10 +13,21 @@ const debug2 = (title: string, msg: string): void => {
   );
 };
 
-const message = (user: string, server: string, msg: string): void => {
+const message = (interaction: ChatInputCommandInteraction): void => {
+  const msg = `${interaction.commandName} ${interaction.options.data
+    .map(
+      option =>
+        `[${option.name}:${
+          option.options
+            ? option.options.map(ops => `{${ops.name}:${ops.value}}`).join(', ')
+            : option.value
+        }]`
+    )
+    .join(', ')}`;
+
   console.info(
-    `${chalk.green.bold('➤')} ${chalk.blue(user)} (${chalk.grey(
-      server
+    `${chalk.green.bold('➤')} ${chalk.blue(interaction.user.tag)} (${chalk.grey(
+      interaction.guild.name
     )}): /${msg}`
   );
 };
