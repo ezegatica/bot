@@ -8,7 +8,9 @@ import {
   botonElecciones,
   botonJugarDenuevo,
   botonUnirse,
-  getName
+  consultarGanador,
+  getName,
+  getPlayReply
 } from '../utils/ppt';
 
 module.exports = {
@@ -16,53 +18,44 @@ module.exports = {
     .setName('ppt')
     .setDescription('Jugar una partida de Piedra Papel o Tijera')
     .addSubcommand(subcommand =>
-      subcommand.setName('solo').setDescription('Jugar solo contra la mega-IA!')
+      subcommand.setName('solo').setDescription('Jugar solo contra la IA!')
     )
     .addSubcommand(subcommand =>
       subcommand.setName('duo').setDescription('Jugar contra un amigo!')
     ),
   async execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply();
+    const embed = getPlayReply(interaction, 'solo').embeds[0]; // Esto es como una base del mensaje, el solo esta para satisfacer al tipado
+
     if (interaction.options.getSubcommand() === 'solo') {
-      const embed = new EmbedBuilder()
-        .setAuthor({
-          name: interaction.user.tag,
-          iconURL: interaction.user.displayAvatarURL()
-        })
-        .setTitle('Piedra Papel o Tijera')
-        .setDescription('Selecciona una opción');
       return interaction.editReply({
         embeds: [embed],
         components: [botonElecciones('solo')]
       });
-    }
-    if (interaction.options.getSubcommand() === 'duo') {
+    } else if (interaction.options.getSubcommand() === 'duo') {
       return interaction.editReply({
         content:
-          'Esta función no está disponible todavía, prueba `/ppt solo` para jugar solo contra la mega-IA!'
+          'Esta función no está disponible todavía, prueba `/ppt solo` para jugar solo contra la IA!'
       });
-      const embed = new EmbedBuilder()
-        .setAuthor({
-          name: `${interaction.user.tag}`,
-          iconURL: interaction.user.displayAvatarURL()
-        })
-        .setTitle('Piedra Papel o Tijera')
-        .setDescription('Esperando a que alguien se una...')
-        .addFields([
-          {
-            name: 'Jugadores',
-            value: '1/2',
-            inline: true
-          }
-        ]);
+      embed.setDescription('Esperando a que alguien se una...').addFields([
+        {
+          name: 'Jugadores',
+          value: '1/2',
+          inline: true
+        }
+      ]);
       return interaction.editReply({
         embeds: [embed],
         components: [botonUnirse]
       });
+    } else {
+      embed.setDescription(
+        'No se como llegaste acá pero lo rompiste, felicitaciones'
+      );
+      return interaction.editReply({
+        embeds: [embed]
+      });
     }
-    return interaction.editReply({
-      content: 'No se como llegaste acá pero lo rompiste, felicitaciones'
-    });
   },
   async buttonExecute(interaction: ButtonInteraction) {
     const userSelection = interaction.customId.split(':')[2] || undefined;
@@ -75,16 +68,7 @@ module.exports = {
         | 'playagainsolo'
     ) {
       case 'join': {
-        const embed = new EmbedBuilder()
-          .setAuthor({
-            name: interaction.user.tag,
-            iconURL: interaction.user.displayAvatarURL()
-          })
-          .setDescription('Selecciona una opción');
-        return interaction.editReply({
-          embeds: [embed],
-          components: [botonElecciones('duo')]
-        });
+        return interaction.editReply(getPlayReply(interaction, 'duo'));
       }
       case 'solo': {
         const embed = new EmbedBuilder().setAuthor({
@@ -107,15 +91,11 @@ module.exports = {
           inline: true
         });
         if (userSelection === botSelection) {
-          embed.addFields({ name: 'Resultado', value: 'Empate' });
-        } else if (
-          (userSelection === 'rock' && botSelection === 'scissors') ||
-          (userSelection === 'paper' && botSelection === 'rock') ||
-          (userSelection === 'scissors' && botSelection === 'paper')
-        ) {
-          embed.addFields({ name: 'Resultado', value: 'Ganaste' });
+          embed.addFields({ name: 'Resultado', value: 'Empate 😐' });
+        } else if (consultarGanador(userSelection, botSelection)) {
+          embed.addFields({ name: 'Resultado', value: 'Ganaste 😁' });
         } else {
-          embed.addFields({ name: 'Resultado', value: 'Perdiste' });
+          embed.addFields({ name: 'Resultado', value: 'Perdiste 😢' });
         }
         return interaction.editReply({
           embeds: [embed],
@@ -124,17 +104,7 @@ module.exports = {
       }
 
       case 'playagainsolo': {
-        const embed = new EmbedBuilder()
-          .setAuthor({
-            name: interaction.user.tag,
-            iconURL: interaction.user.displayAvatarURL()
-          })
-          .setTitle('Piedra Papel o Tijera')
-          .setDescription('Selecciona una opción');
-        return interaction.editReply({
-          embeds: [embed],
-          components: [botonElecciones('solo')]
-        });
+        return interaction.editReply(getPlayReply(interaction, 'solo'));
       }
 
       default:

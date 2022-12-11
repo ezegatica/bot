@@ -1,4 +1,31 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
+  ChatInputCommandInteraction,
+  EmbedBuilder
+} from 'discord.js';
+
+export const getPlayReply = (
+  interaction: ButtonInteraction | ChatInputCommandInteraction,
+  tipo: 'solo' | 'duo'
+): {
+  embeds: EmbedBuilder[];
+  components: Array<ActionRowBuilder<ButtonBuilder>>;
+} => {
+  const embed = new EmbedBuilder()
+    .setAuthor({
+      name: interaction.user.tag,
+      iconURL: interaction.user.displayAvatarURL()
+    })
+    .setTitle('Piedra Papel o Tijera')
+    .setDescription('Selecciona una opción');
+  return {
+    embeds: [embed],
+    components: [botonElecciones(tipo)]
+  };
+};
 
 export const botonUnirse = new ActionRowBuilder<ButtonBuilder>().addComponents(
   new ButtonBuilder()
@@ -20,15 +47,15 @@ export const botonElecciones = (
 ): ActionRowBuilder<ButtonBuilder> =>
   new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
-      .setLabel('Piedra')
+      .setLabel(getName('rock'))
       .setStyle(ButtonStyle.Secondary)
       .setCustomId(`ppt:${tipo}:rock`),
     new ButtonBuilder()
-      .setLabel('Papel')
+      .setLabel(getName('paper'))
       .setStyle(ButtonStyle.Secondary)
       .setCustomId(`ppt:${tipo}:paper`),
     new ButtonBuilder()
-      .setLabel('Tijera')
+      .setLabel(getName('scissors'))
       .setStyle(ButtonStyle.Secondary)
       .setCustomId(`ppt:${tipo}:scissors`)
   );
@@ -36,10 +63,21 @@ export const botonElecciones = (
 export const getName = (id: string): string => {
   switch (id) {
     case 'rock':
-      return 'Piedra';
+      return 'Piedra 👊';
     case 'paper':
-      return 'Papel';
+      return 'Papel ✋';
     case 'scissors':
-      return 'Tijera';
+      return 'Tijera ✌';
   }
+};
+
+export const consultarGanador = (
+  firstSelection: string,
+  secondSelection: string
+): boolean => {
+  return (
+    (firstSelection === 'rock' && secondSelection === 'scissors') ||
+    (firstSelection === 'paper' && secondSelection === 'rock') ||
+    (firstSelection === 'scissors' && secondSelection === 'paper')
+  );
 };
