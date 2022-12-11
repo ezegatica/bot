@@ -32,6 +32,16 @@ module.exports = {
               name: '/simpsons frase',
               value: 'Tira una frase random de Los Simpsons',
               inline: true
+            },
+            {
+              name: '/definir <frase>',
+              value: 'Busca en Urban Dictionary la definicion de la frase',
+              inline: true
+            },
+            {
+              name: '/gato',
+              value: 'Usando la CatAPI, te muestra una foto de un gato',
+              inline: true
             }
           ],
           footer: {

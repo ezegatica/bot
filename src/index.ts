@@ -8,7 +8,7 @@ import { Command } from './utils/types';
 const client: Client<boolean> & {
   commands?: Collection<string, Command>;
 } = new Client({
-  intents: [GatewayIntentBits.Guilds]
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers]
 });
 client.commands = new Collection<string, Command>();
 
