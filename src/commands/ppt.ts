@@ -4,15 +4,18 @@ import {
   EmbedBuilder,
   SlashCommandBuilder
 } from 'discord.js';
-import { getGame, initGame, updateGame } from '../utils/db';
 import {
   botonDejarDeJugar,
   botonElecciones,
   botonJugarDenuevo,
   botonUnirse,
   consultarGanador,
+  deleteGame,
+  gameGuard,
+  getGame,
   getName,
-  getPlayReply
+  getPlayReply,
+  updateGame
 } from '../utils/ppt';
 
 module.exports = {
@@ -75,9 +78,10 @@ module.exports = {
         return interaction.editReply(getPlayReply(interaction, 'duo'));
       }
       case 'solo': {
-        const gameData = await getGame(gameID);
-        if (!gameData) {
-          await initGame(gameID, interaction.user.username, 'Gati Bot');
+        const gameData = await getGame(gameID, interaction);
+        const guardRes = await gameGuard(gameData, interaction);
+        if (guardRes) {
+          return guardRes;
         }
         const embed = new EmbedBuilder().setAuthor({
           name: `${interaction.user.username} vs Gati Bot`,
@@ -110,7 +114,7 @@ module.exports = {
         }
         const game = await getGame(gameID);
         embed.setFooter({
-          text: `${game.player1} (${game.player1Score}) vs ${game.player2} (${game.player2Score})`
+          text: `${game.player1.username} (${game.player1.score}) vs ${game.player2.username} (${game.player2.score})`
         });
         return interaction.editReply({
           embeds: [embed],
@@ -119,11 +123,20 @@ module.exports = {
       }
 
       case 'playagainsolo': {
+        const gameData = await getGame(gameID);
+        const guardRes = await gameGuard(gameData, interaction);
+        if (guardRes) {
+          return guardRes;
+        }
         return interaction.editReply(getPlayReply(interaction, 'solo'));
       }
 
       case 'stopgamesolo': {
         const gameData = await getGame(gameID);
+        const guardRes = await gameGuard(gameData, interaction);
+        if (guardRes) {
+          return guardRes;
+        }
         const embed = new EmbedBuilder()
           .setAuthor({
             name: `${interaction.user.username} vs Gati Bot`,
@@ -134,16 +147,17 @@ module.exports = {
           .addFields({
             name: 'Ganador',
             value:
-              gameData.player1Score > gameData.player2Score
-                ? gameData.player1
-                : gameData.player1Score < gameData.player2Score
-                ? gameData.player2
+              gameData.player1.score > gameData.player2.score
+                ? gameData.player1.username
+                : gameData.player1.score < gameData.player2.score
+                ? gameData.player2.username
                 : 'Empate!',
             inline: true
           })
           .setFooter({
-            text: `${gameData.player1} (${gameData.player1Score}) vs ${gameData.player2} (${gameData.player2Score})`
+            text: `${gameData.player1.username} (${gameData.player1.score}) vs ${gameData.player2.username} (${gameData.player2.score})`
           });
+        await deleteGame(gameID);
         return interaction.editReply({
           embeds: [embed],
           components: []

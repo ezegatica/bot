@@ -4,8 +4,10 @@ import {
   ButtonInteraction,
   ButtonStyle,
   ChatInputCommandInteraction,
-  EmbedBuilder
+  EmbedBuilder,
+  Message
 } from 'discord.js';
+import { db } from './db';
 
 export const getPlayReply = (
   interaction: ButtonInteraction | ChatInputCommandInteraction,
@@ -18,7 +20,7 @@ export const getPlayReply = (
     .setAuthor({
       name:
         tipo === 'solo'
-          ? `${interaction.user.username} vs Gati Bot`
+          ? `${interaction.user.username} vs ${interaction.guild.client.user.username}`
           : interaction.user.tag,
       iconURL: interaction.user.displayAvatarURL()
     })
@@ -91,4 +93,129 @@ export const consultarGanador = (
     (firstSelection === 'paper' && secondSelection === 'rock') ||
     (firstSelection === 'scissors' && secondSelection === 'paper')
   );
+};
+
+const TTL = 60 * 60 * 6 * 1000;
+
+export interface GameData {
+  expired?: boolean;
+  player1: Player;
+  player2: Player;
+}
+
+export const getGame = async (
+  id: string,
+  init?: ButtonInteraction
+): Promise<GameData> => {
+  const rawData = await db.get(id);
+  if (!rawData) {
+    if (init) {
+      await initGame(
+        id,
+        {
+          username: init.user.username,
+          id: init.user.id
+        },
+        {
+          username: init.client.user.username,
+          id: init.client.user.id
+        }
+      );
+      return getGame(id);
+    }
+    return {
+      expired: true,
+      player1: {
+        id: '',
+        username: '',
+        score: 0
+      },
+      player2: {
+        id: '',
+        username: '',
+        score: 0
+      }
+    };
+  }
+  return JSON.parse(rawData);
+};
+
+interface Player {
+  username: string;
+  id: string;
+  score: number;
+}
+
+export const initGame = async (
+  id: string,
+  player1: Omit<Player, 'score'>,
+  player2: Omit<Player, 'score'>
+): Promise<void> => {
+  const gameData: GameData = {
+    player1: {
+      ...player1,
+      score: 0
+    },
+    player2: {
+      ...player2,
+      score: 0
+    }
+  };
+  await db.set(id, JSON.stringify(gameData), TTL);
+};
+
+export const updateGame = async (
+  id: string,
+  increasePlayer1Score: boolean,
+  increasePlayer2Score: boolean
+): Promise<void> => {
+  const gameData = await getGame(id);
+  if (increasePlayer1Score) {
+    gameData.player1.score++;
+  }
+  if (increasePlayer2Score) {
+    gameData.player2.score++;
+  }
+  await db.set(id, JSON.stringify(gameData), TTL);
+};
+
+export const deleteGame = async (id: string): Promise<void> => {
+  await db.delete(id);
+};
+
+export const gameGuard = async (
+  gameData: GameData,
+  interaction: ButtonInteraction
+): Promise<Message<any>> => {
+  if (gameData.player1.id !== interaction.user.id) {
+    if (gameData.expired) {
+      const msg = await interaction.fetchReply();
+      await msg.edit({
+        embeds: [
+          new EmbedBuilder()
+            .setTitle('Piedra Papel o Tijera')
+            .setDescription('Juego terminado!')
+            .setAuthor({
+              name: msg.embeds[0].author.name,
+              iconURL: msg.embeds[0].author.iconURL
+            })
+            .addFields([
+              {
+                name: 'Resultado',
+                value: msg.embeds[0].footer.text
+              }
+            ])
+        ],
+        components: []
+      });
+      return interaction.followUp({
+        content: 'Esta partida ya expiró!',
+        ephemeral: true
+      });
+    }
+    return interaction.followUp({
+      content: 'No puedes interactuar con una partida que no iniciaste!',
+      ephemeral: true
+    });
+  }
 };
