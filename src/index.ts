@@ -30,38 +30,40 @@ client.on('ready', async () => {
 });
 
 client.on('interactionCreate', async interaction => {
-  if (!interaction.isChatInputCommand()) return;
-  Logger.message(
-    interaction.user.tag,
-    interaction.guild.name,
-    `${interaction.commandName} ${interaction.options.data
-      .map(
-        option =>
-          `[${option.name}:${
-            option.options
-              ? option.options
-                  .map(ops => `{${ops.name}:${ops.value}}`)
-                  .join(', ')
-              : option.value
-          }]`
-      )
-      .join(', ')}`
-  );
-  // Correr comandos
-  const command = client.commands.get(interaction.commandName);
+  if (interaction.isButton()) {
+    const handler = client.commands.get(interaction.customId.split(':')[0]); // Asi se llama el handler del comando, y podemos tener varios subcomandos/subbotones
 
-  if (!command) return;
+    if (!handler) return;
 
-  try {
-    await command.execute(interaction);
-  } catch (error: any) {
-    Logger.error(error.message);
-    console.error(error.stack);
-    await interaction.reply({
-      content:
-        'Hubo un error al ejecutar el comando!\nPor favor, intenta de nuevo. Si el error persiste, contacta a Gati#2615',
-      ephemeral: true
-    });
+    try {
+      await handler.buttonExecute(interaction);
+    } catch (error: any) {
+      Logger.error(error.message);
+      console.error(error.stack);
+      await interaction.reply({
+        content:
+          'Hubo un error al ejecutar el handler!\nPor favor, intenta de nuevo. Si el error persiste, contacta a Gati#2615',
+        ephemeral: true
+      });
+    }
+    return;
+  }
+  if (interaction.isChatInputCommand()) {
+    Logger.message(interaction);
+    // Correr comandos
+    const command = client.commands.get(interaction.commandName);
+
+    try {
+      await command.execute(interaction);
+    } catch (error: any) {
+      Logger.error(error.message);
+      console.error(error.stack);
+      await interaction.reply({
+        content:
+          'Hubo un error al ejecutar el comando!\nPor favor, intenta de nuevo. Si el error persiste, contacta a Gati#2615',
+        ephemeral: true
+      });
+    }
   }
 });
 

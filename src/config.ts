@@ -4,7 +4,9 @@ dotenv.config();
 
 export const config = {
   TOKEN: process.env.TOKEN,
-  CLIENT_ID: process.env.CLIENT_ID
+  CLIENT_ID: process.env.CLIENT_ID,
+  NODE_ENV: process.env.NODE_ENV || 'production',
+  DATABASE_URL: process.env.DATABASE_URL
 };
 
 export default config;
