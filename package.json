@@ -34,6 +34,7 @@
     "chalk": "4.1.2",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
+    "keyv": "^4.5.2",
     "node-fetch": "^2",
     "rimraf": "^3.0.2"
   },

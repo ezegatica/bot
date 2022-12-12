@@ -16,7 +16,10 @@ export const getPlayReply = (
 } => {
   const embed = new EmbedBuilder()
     .setAuthor({
-      name: interaction.user.tag,
+      name:
+        tipo === 'solo'
+          ? `${interaction.user.username} vs Gati Bot`
+          : interaction.user.tag,
       iconURL: interaction.user.displayAvatarURL()
     })
     .setTitle('Piedra Papel o Tijera')
@@ -40,6 +43,14 @@ export const botonJugarDenuevo =
       .setLabel('Jugar de nuevo')
       .setStyle(ButtonStyle.Primary)
       .setCustomId('ppt:playagainsolo')
+  );
+
+export const botonDejarDeJugar =
+  new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setLabel('Terminar juego')
+      .setStyle(ButtonStyle.Danger)
+      .setCustomId('ppt:stopgamesolo')
   );
 
 export const botonElecciones = (

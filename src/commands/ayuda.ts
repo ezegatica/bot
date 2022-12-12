@@ -42,6 +42,11 @@ module.exports = {
               name: '/gato',
               value: 'Usando la CatAPI, te muestra una foto de un gato',
               inline: true
+            },
+            {
+              name: '/ppt solo',
+              value: 'Juega piedra papel o tijera contra la IA',
+              inline: true
             }
           ],
           footer: {
