@@ -9,6 +9,7 @@ jobs:
     name: '🤠 Build and Test'
     timeout-minutes: 5
     runs-on: ubuntu-latest
+    steps:
     - name: 'Setup Node.js 16'
       uses: actions/setup-node@v3
       with:
