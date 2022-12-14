@@ -85,14 +85,23 @@ module.exports = {
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:gol')
     );
+    const controles = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setLabel('Detener')
+        .setStyle(ButtonStyle.Danger)
+        .setCustomId('botonera:stop'),
+      new ButtonBuilder()
+        .setLabel('Andate')
+        .setStyle(ButtonStyle.Primary)
+        .setCustomId('botonera:leave')
+    );
     return interaction.reply({
       embeds: [embed],
-      components: [botones, botones2, botones3]
+      components: [botones, botones2, botones3, controles]
     });
   },
   async buttonExecute(interaction: ButtonInteraction) {
-    const choice = interaction.customId.split(':')[1];
-    const soundPath = join(process.cwd(), 'dist', 'assets', `${choice}.mp3`);
+    const i = await interaction.deferUpdate();
     const vcId = interaction.guild.members.cache.get(interaction.user.id).voice
       .channelId;
     if (!vcId) {
@@ -101,11 +110,22 @@ module.exports = {
         content: 'No estas en un canal de voz, unite y me uno!'
       });
     }
+    const choice = interaction.customId.split(':')[1];
+    if (choice === 'stop') {
+      Player.stop();
+      return i;
+    }
     const connection = joinVoiceChannel({
       channelId: vcId,
       guildId: interaction.guild.id,
       adapterCreator: interaction.guild.voiceAdapterCreator
     });
+    if (choice === 'leave') {
+      Player.stop();
+      connection.destroy();
+      return i;
+    }
+    const soundPath = join(process.cwd(), 'dist', 'assets', `${choice}.mp3`);
     connection.subscribe(Player);
 
     const resource = createAudioResource(soundPath, {
@@ -113,6 +133,6 @@ module.exports = {
     });
 
     Player.play(resource);
-    return interaction.deferUpdate();
+    return i;
   }
 };
