@@ -6,15 +6,15 @@ import {
 } from 'discord.js';
 import {
   botonDejarDeJugar,
-  botonElecciones,
   botonJugarDenuevo,
-  botonUnirse,
   consultarGanador,
   deleteGame,
   gameGuard,
+  getDuoPlayReply,
   getGame,
   getName,
-  getPlayReply,
+  getSoloPlayReply,
+  setGame,
   updateGame
 } from '../utils/ppt';
 
@@ -30,42 +30,24 @@ module.exports = {
     ),
   async execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply();
-    const embed = getPlayReply(interaction, 'solo').embeds[0]; // Esto es como una base del mensaje, el solo esta para satisfacer al tipado
 
     if (interaction.options.getSubcommand() === 'solo') {
-      return interaction.editReply({
-        embeds: [embed],
-        components: [botonElecciones('solo')]
-      });
+      // Esto es como una base del mensaje, el solo esta para satisfacer al tipado
+      return interaction.editReply(getSoloPlayReply(interaction));
     } else if (interaction.options.getSubcommand() === 'duo') {
+      return interaction.editReply(getDuoPlayReply());
+    } else {
       return interaction.editReply({
         content:
-          'Esta función no está disponible todavía, prueba `/ppt solo` para jugar solo contra la IA!'
-      });
-      embed.setDescription('Esperando a que alguien se una...').addFields([
-        {
-          name: 'Jugadores',
-          value: '1/2',
-          inline: true
-        }
-      ]);
-      return interaction.editReply({
-        embeds: [embed],
-        components: [botonUnirse]
-      });
-    } else {
-      embed.setDescription(
-        'No se como llegaste acá pero lo rompiste, felicitaciones'
-      );
-      return interaction.editReply({
-        embeds: [embed]
+          'No se como, pero llegaste a un lugar donde no deberias haber llegado\nPartida cancelada!',
+        embeds: []
       });
     }
   },
   async buttonExecute(interaction: ButtonInteraction) {
     const userSelection = interaction.customId.split(':')[2] || undefined;
     const gameID = interaction.message.id;
-    await interaction.deferUpdate();
+    const i = await interaction.deferUpdate();
     switch (
       interaction.customId.split(':')[1] as
         | 'join'
@@ -75,7 +57,51 @@ module.exports = {
         | 'stopgamesolo'
     ) {
       case 'join': {
-        return interaction.editReply(getPlayReply(interaction, 'duo'));
+        const gameData = await getGame(gameID, interaction, true);
+        if (!gameData.player1.joined) {
+          gameData.player1 = {
+            id: interaction.user.id,
+            username: interaction.user.username,
+            joined: true,
+            score: 0
+          };
+          await setGame(gameID, gameData);
+          return interaction.editReply(getDuoPlayReply(gameData));
+        }
+        if (!gameData.player2.joined) {
+          if (gameData.player1.id === interaction.user.id) {
+            return interaction.followUp({
+              content: 'No puedes jugar contra vos mismo',
+              ephemeral: true
+            });
+          }
+          gameData.player2 = {
+            id: interaction.user.id,
+            username: interaction.user.username,
+            joined: true,
+            score: 0
+          };
+          await setGame(gameID, gameData);
+          return interaction.editReply(getDuoPlayReply(gameData));
+        }
+
+        if (gameData.player1.joined && gameData.player2.joined) {
+          return interaction.editReply(getDuoPlayReply(gameData));
+        }
+
+        return i;
+      }
+      case 'duo': {
+        const gameData = await getGame(gameID, interaction);
+        const guardRes = await gameGuard(gameData, interaction);
+        if (guardRes) {
+          return guardRes;
+        }
+        const videoUrl = 'https://gatica.sirv.com/public/simpsons.gif';
+        return interaction.followUp({
+          content: 'Hagamos de cuenta que estamos jugando',
+          files: [{ attachment: videoUrl, name: 'imagination.gif' }]
+        });
       }
       case 'solo': {
         const gameData = await getGame(gameID, interaction);
@@ -128,7 +154,7 @@ module.exports = {
         if (guardRes) {
           return guardRes;
         }
-        return interaction.editReply(getPlayReply(interaction, 'solo'));
+        return interaction.editReply(getSoloPlayReply(interaction));
       }
 
       case 'stopgamesolo': {
@@ -165,7 +191,8 @@ module.exports = {
       }
 
       default:
-        return interaction.editReply({
+        return interaction.followUp({
+          ephemeral: true,
           content: 'No se reconoce el comando!'
         });
     }
