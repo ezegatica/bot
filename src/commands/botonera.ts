@@ -1,4 +1,5 @@
 import {
+  NoSubscriberBehavior,
   StreamType,
   createAudioPlayer,
   createAudioResource,
@@ -15,7 +16,11 @@ import {
 } from 'discord.js';
 import { join } from 'path';
 
-const Player = createAudioPlayer();
+const Player = createAudioPlayer({
+  behaviors: {
+    noSubscriber: NoSubscriberBehavior.Pause
+  }
+});
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('botonera')
@@ -23,7 +28,9 @@ module.exports = {
   async execute(interaction: ChatInputCommandInteraction) {
     const embed = new EmbedBuilder()
       .setTitle('Botonera')
-      .setDescription('Reproduce sonidos en el chat de voz');
+      .setDescription(
+        '**Selecciona un sonido para reproducirlo!**\n(Tienes que estar en un canal de voz)'
+      );
     const botones = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setLabel('Oh My Gawd')
@@ -50,19 +57,52 @@ module.exports = {
       new ButtonBuilder()
         .setLabel('What the hell')
         .setStyle(ButtonStyle.Secondary)
-        .setCustomId('botonera:wth')
+        .setCustomId('botonera:wth'),
+      new ButtonBuilder()
+        .setLabel('WinXP Startup')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:wxp2'),
+      new ButtonBuilder()
+        .setLabel('WinXP Shutdown')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:wxp1'),
+      new ButtonBuilder()
+        .setLabel('WinXP Error')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:wxp3')
+    );
+    const botones3 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setLabel('Samsung')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:samsung'),
+      new ButtonBuilder()
+        .setLabel('Ankara Messi')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:ankara'),
+      new ButtonBuilder()
+        .setLabel('Golgolgol')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:gol')
     );
     return interaction.reply({
       embeds: [embed],
-      components: [botones, botones2]
+      components: [botones, botones2, botones3]
     });
   },
   async buttonExecute(interaction: ButtonInteraction) {
     const choice = interaction.customId.split(':')[1];
-    await interaction.deferUpdate();
     const soundPath = join(process.cwd(), 'dist', 'assets', `${choice}.mp3`);
+    const vcId = interaction.guild.members.cache.get(interaction.user.id).voice
+      .channelId;
+    if (!vcId) {
+      return interaction.followUp({
+        ephemeral: true,
+        content: 'No estas en un canal de voz, unite y me uno!'
+      });
+    }
     const connection = joinVoiceChannel({
-      channelId: '827652966759530608',
+      channelId: vcId,
       guildId: interaction.guild.id,
       adapterCreator: interaction.guild.voiceAdapterCreator
     });
@@ -73,6 +113,6 @@ module.exports = {
     });
 
     Player.play(resource);
-    return interaction.editReply({});
+    return interaction.deferUpdate();
   }
 };

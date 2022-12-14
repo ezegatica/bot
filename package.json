@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc",
     "prebuild": "rimraf dist",
+    "postbuild": "zx scripts/postbuild.mjs",
     "start": "node dist/index.js",
     "register": "node dist/deploy-commands.js",
     "dev": "nodemon --exec ts-node src/index.ts",
@@ -42,7 +43,8 @@
     "keyv": "^4.5.2",
     "libsodium-wrappers": "^0.7.10",
     "node-fetch": "^2",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "zx": "^7.1.1"
   },
   "engines": {
     "node": ">=16.10"

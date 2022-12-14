@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { ChatInputCommandInteraction } from 'discord.js';
+import { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js';
 
 const debug = (msg: string): void => {
   console.debug(`${chalk.bgCyan.white.bold(' DEBUG ')} ${chalk.cyan(msg)}`);
@@ -13,6 +13,12 @@ const debug2 = (title: string, msg: string): void => {
   );
 };
 
+const fecha = () =>
+  new Date().toLocaleDateString('es-AR', {
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric'
+  });
 const message = (interaction: ChatInputCommandInteraction): void => {
   const msg = `${interaction.commandName} ${interaction.options.data
     .map(
@@ -28,7 +34,15 @@ const message = (interaction: ChatInputCommandInteraction): void => {
   console.info(
     `${chalk.green.bold('➤')} ${chalk.blue(interaction.user.tag)} (${chalk.grey(
       interaction.guild.name
-    )}): /${msg}`
+    )}) [${fecha()}]: /${msg}`
+  );
+};
+const button = (interaction: ButtonInteraction): void => {
+  const msg = `${interaction.customId}`;
+  console.info(
+    `${chalk.magenta.bold('➤')} ${chalk.blue(
+      interaction.user.tag
+    )} (${chalk.grey(interaction.guild.name)}) [${fecha()}]: ${msg}`
   );
 };
 
@@ -74,5 +88,6 @@ export default {
   error,
   step,
   substep,
-  message
+  message,
+  button
 };

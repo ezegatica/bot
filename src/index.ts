@@ -35,6 +35,8 @@ client.on('ready', async () => {
 
 client.on('interactionCreate', async interaction => {
   if (interaction.isButton()) {
+    Logger.button(interaction);
+
     const handler = client.commands.get(interaction.customId.split(':')[0]); // Asi se llama el handler del comando, y podemos tener varios subcomandos/subbotones
 
     if (!handler) return;
