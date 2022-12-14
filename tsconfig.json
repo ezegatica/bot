@@ -19,8 +19,9 @@
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "incremental": true
   },
   "exclude": ["node_modules", "dist"],
-  "include": ["src"]
+  "include": ["src", "src/**/*.mp3"]
 }
