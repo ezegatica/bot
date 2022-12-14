@@ -34,8 +34,9 @@ module.exports = {
               inline: true
             },
             {
-              name: '/definir <frase>',
-              value: 'Busca en Urban Dictionary la definicion de la frase',
+              name: '/botonera',
+              value:
+                'Envia una botonera interactiva con sonidos para reproducir en tu chat de voz',
               inline: true
             },
             {

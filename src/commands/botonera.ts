@@ -24,7 +24,9 @@ const Player = createAudioPlayer({
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('botonera')
-    .setDescription('Botonera con sonidos!'),
+    .setDescription(
+      'Botonera interactiva con sonidos para reproducir en un chat de voz!'
+    ),
   async execute(interaction: ChatInputCommandInteraction) {
     const embed = new EmbedBuilder()
       .setTitle('Botonera')
