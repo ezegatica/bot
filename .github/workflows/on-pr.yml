@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    name: '🤠 Build and Test'
     timeout-minutes: 5
     runs-on: ubuntu-latest
     - name: 'Setup Node.js 16'
