@@ -8,7 +8,11 @@ import { Command } from './utils/types';
 const client: Client<boolean> & {
   commands?: Collection<string, Command>;
 } = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildVoiceStates
+  ]
 });
 client.commands = new Collection<string, Command>();
 
@@ -31,6 +35,8 @@ client.on('ready', async () => {
 
 client.on('interactionCreate', async interaction => {
   if (interaction.isButton()) {
+    Logger.button(interaction);
+
     const handler = client.commands.get(interaction.customId.split(':')[0]); // Asi se llama el handler del comando, y podemos tener varios subcomandos/subbotones
 
     if (!handler) return;
