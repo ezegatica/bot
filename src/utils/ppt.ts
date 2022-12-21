@@ -9,27 +9,103 @@ import {
 } from 'discord.js';
 import { db } from './db';
 
-export const getPlayReply = (
-  interaction: ButtonInteraction | ChatInputCommandInteraction,
-  tipo: 'solo' | 'duo'
+export const getSoloPlayReply = (
+  interaction: ButtonInteraction | ChatInputCommandInteraction
 ): {
   embeds: EmbedBuilder[];
   components: Array<ActionRowBuilder<ButtonBuilder>>;
 } => {
   const embed = new EmbedBuilder()
     .setAuthor({
-      name:
-        tipo === 'solo'
-          ? `${interaction.user.username} vs ${interaction.guild.client.user.username}`
-          : interaction.user.tag,
+      name: `${interaction.user.username} vs ${interaction.guild.client.user.username}`,
       iconURL: interaction.user.displayAvatarURL()
     })
     .setTitle('Piedra Papel o Tijera')
     .setDescription('Selecciona una opción');
   return {
     embeds: [embed],
-    components: [botonElecciones(tipo)]
+    components: [botonElecciones('solo')]
   };
+};
+
+export const getDuoPlayReply = (
+  gameData?: GameData
+): {
+  embeds: EmbedBuilder[];
+  components: Array<ActionRowBuilder<ButtonBuilder>>;
+} => {
+  const embed = new EmbedBuilder()
+    .setAuthor({
+      name: `${
+        gameData
+          ? `${gameData.player1.username || 'Player ?'} vs ${
+              gameData.player2.username || 'Player ?'
+            }`
+          : 'Player 1 vs Player 2'
+      }`
+    })
+    .setTitle('Piedra Papel o Tijera');
+  if (gameData) {
+    if (gameData.player1.joined) {
+      if (gameData.player2.joined) {
+        embed
+          .setDescription('Seleccionen una opcion!')
+          .addFields([
+            {
+              name: 'Jugadores',
+              value: '2/2',
+              inline: true
+            },
+            {
+              name: 'Jugador 1',
+              value: gameData.player1.username,
+              inline: true
+            },
+            {
+              name: 'Jugador 2',
+              value: gameData.player2.username,
+              inline: true
+            }
+          ])
+          .setFooter({
+            text: `${gameData.player1.username} (${gameData.player1.score}) vs ${gameData.player2.username} (${gameData.player2.score})`
+          });
+        return {
+          embeds: [embed],
+          components: [botonElecciones('duo')]
+        };
+      } else {
+        embed.setDescription('Esperando un jugador mas...').addFields([
+          {
+            name: 'Jugadores',
+            value: '1/2',
+            inline: true
+          },
+          {
+            name: 'Jugador 1',
+            value: gameData.player1.username,
+            inline: true
+          }
+        ]);
+        return {
+          embeds: [embed],
+          components: [botonUnirse]
+        };
+      }
+    }
+  } else {
+    embed.setDescription('Esperando a que alguien se una...').addFields([
+      {
+        name: 'Jugadores',
+        value: '0/2',
+        inline: true
+      }
+    ]);
+    return {
+      embeds: [embed],
+      components: [botonUnirse]
+    };
+  }
 };
 
 export const botonUnirse = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -105,7 +181,8 @@ export interface GameData {
 
 export const getGame = async (
   id: string,
-  init?: ButtonInteraction
+  init?: ButtonInteraction,
+  duo?: boolean
 ): Promise<GameData> => {
   const rawData = await db.get(id);
   if (!rawData) {
@@ -113,12 +190,14 @@ export const getGame = async (
       await initGame(
         id,
         {
-          username: init.user.username,
-          id: init.user.id
+          username: duo ? null : init.user.username,
+          id: duo ? null : init.user.id,
+          joined: duo ? false : true
         },
         {
-          username: init.client.user.username,
-          id: init.client.user.id
+          username: duo ? null : init.client.user.username,
+          id: duo ? null : init.client.user.id,
+          joined: duo ? false : true
         }
       );
       return getGame(id);
@@ -128,11 +207,13 @@ export const getGame = async (
       player1: {
         id: '',
         username: '',
+        joined: false,
         score: 0
       },
       player2: {
         id: '',
         username: '',
+        joined: false,
         score: 0
       }
     };
@@ -143,7 +224,9 @@ export const getGame = async (
 interface Player {
   username: string;
   id: string;
+  joined: boolean;
   score: number;
+  selection?: string;
 }
 
 export const initGame = async (
@@ -179,6 +262,13 @@ export const updateGame = async (
   await db.set(id, JSON.stringify(gameData), TTL);
 };
 
+export const setGame = async (
+  id: string,
+  gameData: GameData
+): Promise<void> => {
+  await db.set(id, JSON.stringify(gameData), TTL);
+};
+
 export const deleteGame = async (id: string): Promise<void> => {
   await db.delete(id);
 };
@@ -187,7 +277,10 @@ export const gameGuard = async (
   gameData: GameData,
   interaction: ButtonInteraction
 ): Promise<Message<any>> => {
-  if (gameData.player1.id !== interaction.user.id) {
+  if (
+    gameData.player1.id !== interaction.user.id &&
+    gameData.player2.id !== interaction.user.id
+  ) {
     if (gameData.expired) {
       const msg = await interaction.fetchReply();
       await msg.edit({
@@ -218,4 +311,13 @@ export const gameGuard = async (
       ephemeral: true
     });
   }
+};
+
+export const resetGame = async (
+  gameData: GameData,
+  id: string
+): Promise<void> => {
+  gameData.player1.selection = undefined;
+  gameData.player2.selection = undefined;
+  await setGame(id, gameData);
 };

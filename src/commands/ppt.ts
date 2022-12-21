@@ -6,15 +6,16 @@ import {
 } from 'discord.js';
 import {
   botonDejarDeJugar,
-  botonElecciones,
   botonJugarDenuevo,
-  botonUnirse,
   consultarGanador,
   deleteGame,
   gameGuard,
+  getDuoPlayReply,
   getGame,
   getName,
-  getPlayReply,
+  getSoloPlayReply,
+  resetGame,
+  setGame,
   updateGame
 } from '../utils/ppt';
 
@@ -30,42 +31,24 @@ module.exports = {
     ),
   async execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply();
-    const embed = getPlayReply(interaction, 'solo').embeds[0]; // Esto es como una base del mensaje, el solo esta para satisfacer al tipado
 
     if (interaction.options.getSubcommand() === 'solo') {
-      return interaction.editReply({
-        embeds: [embed],
-        components: [botonElecciones('solo')]
-      });
+      // Esto es como una base del mensaje, el solo esta para satisfacer al tipado
+      return interaction.editReply(getSoloPlayReply(interaction));
     } else if (interaction.options.getSubcommand() === 'duo') {
+      return interaction.editReply(getDuoPlayReply());
+    } else {
       return interaction.editReply({
         content:
-          'Esta función no está disponible todavía, prueba `/ppt solo` para jugar solo contra la IA!'
-      });
-      embed.setDescription('Esperando a que alguien se una...').addFields([
-        {
-          name: 'Jugadores',
-          value: '1/2',
-          inline: true
-        }
-      ]);
-      return interaction.editReply({
-        embeds: [embed],
-        components: [botonUnirse]
-      });
-    } else {
-      embed.setDescription(
-        'No se como llegaste acá pero lo rompiste, felicitaciones'
-      );
-      return interaction.editReply({
-        embeds: [embed]
+          'No se como, pero llegaste a un lugar donde no deberias haber llegado\nPartida cancelada!',
+        embeds: []
       });
     }
   },
   async buttonExecute(interaction: ButtonInteraction) {
     const userSelection = interaction.customId.split(':')[2] || undefined;
     const gameID = interaction.message.id;
-    await interaction.deferUpdate();
+    const i = await interaction.deferUpdate();
     switch (
       interaction.customId.split(':')[1] as
         | 'join'
@@ -75,7 +58,116 @@ module.exports = {
         | 'stopgamesolo'
     ) {
       case 'join': {
-        return interaction.editReply(getPlayReply(interaction, 'duo'));
+        const gameData = await getGame(gameID, interaction, true);
+        if (!gameData.player1.joined) {
+          gameData.player1 = {
+            id: interaction.user.id,
+            username: interaction.user.username,
+            joined: true,
+            score: 0
+          };
+          await setGame(gameID, gameData);
+          return interaction.editReply(getDuoPlayReply(gameData));
+        }
+        if (!gameData.player2.joined) {
+          if (gameData.player1.id === interaction.user.id) {
+            return interaction.followUp({
+              content: 'No puedes jugar contra vos mismo',
+              ephemeral: true
+            });
+          }
+          gameData.player2 = {
+            id: interaction.user.id,
+            username: interaction.user.username,
+            joined: true,
+            score: 0
+          };
+          await setGame(gameID, gameData);
+          return interaction.editReply(getDuoPlayReply(gameData));
+        }
+
+        if (gameData.player1.joined && gameData.player2.joined) {
+          return interaction.editReply(getDuoPlayReply(gameData));
+        }
+
+        return i;
+      }
+      case 'duo': {
+        const gameData = await getGame(gameID, interaction);
+        const guardRes = await gameGuard(gameData, interaction);
+        if (guardRes) {
+          return guardRes;
+        }
+        if (gameData.player1.id === interaction.user.id) {
+          gameData.player1.selection = userSelection;
+        }
+        if (gameData.player2.id === interaction.user.id) {
+          gameData.player2.selection = userSelection;
+        }
+        await setGame(gameID, gameData);
+        if (gameData.player1.selection && gameData.player2.selection) {
+          const embed = new EmbedBuilder()
+            .setTitle('Piedra Papel o Tijera')
+            .addFields({
+              name: `${gameData.player1.username} eligió`,
+              value: getName(gameData.player1.selection),
+              inline: true
+            })
+            .addFields({
+              name: `${gameData.player2.username} eligió`,
+              value: getName(gameData.player2.selection),
+              inline: true
+            });
+          if (gameData.player1.selection === gameData.player2.selection) {
+            embed.addFields({ name: 'Resultado', value: 'Empate 😐' });
+            await updateGame(gameID, true, true);
+          } else if (
+            consultarGanador(
+              gameData.player1.selection,
+              gameData.player2.selection
+            )
+          ) {
+            embed.addFields({
+              name: 'Resultado',
+              value: `Ganó ${gameData.player1.username} 🎉`
+            });
+            await updateGame(gameID, true, false);
+          } else {
+            embed.addFields({
+              name: 'Resultado',
+              value: `Ganó ${gameData.player2.username} 🎉`
+            });
+            await updateGame(gameID, false, true);
+          }
+          const game = await getGame(gameID);
+          embed
+            .setFooter({
+              text: `${game.player1.username} (${game.player1.score}) vs ${game.player2.username} (${game.player2.score})`
+            })
+            .setDescription('Una nueva partida comenzará en 5 segundos...');
+          await interaction.editReply({
+            embeds: [embed],
+            components: []
+          });
+
+          // wait 5 seconds and start another game
+          await resetGame(game, gameID);
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          return interaction.editReply(getDuoPlayReply(game));
+        } else {
+          const reply = getDuoPlayReply(gameData);
+          const embed = reply.embeds[0];
+          if (gameData.player1.selection) {
+            embed.setDescription(`${gameData.player1.username} ya eligió`);
+          }
+          if (gameData.player2.selection) {
+            embed.setDescription(`${gameData.player2.username} ya eligió`);
+          }
+          return interaction.editReply({
+            embeds: [embed],
+            components: reply.components
+          });
+        }
       }
       case 'solo': {
         const gameData = await getGame(gameID, interaction);
@@ -128,7 +220,7 @@ module.exports = {
         if (guardRes) {
           return guardRes;
         }
-        return interaction.editReply(getPlayReply(interaction, 'solo'));
+        return interaction.editReply(getSoloPlayReply(interaction));
       }
 
       case 'stopgamesolo': {
@@ -165,7 +257,8 @@ module.exports = {
       }
 
       default:
-        return interaction.editReply({
+        return interaction.followUp({
+          ephemeral: true,
           content: 'No se reconoce el comando!'
         });
     }
