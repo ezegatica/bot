@@ -226,6 +226,7 @@ interface Player {
   id: string;
   joined: boolean;
   score: number;
+  selection?: string;
 }
 
 export const initGame = async (
@@ -310,4 +311,13 @@ export const gameGuard = async (
       ephemeral: true
     });
   }
+};
+
+export const resetGame = async (
+  gameData: GameData,
+  id: string
+): Promise<void> => {
+  gameData.player1.selection = undefined;
+  gameData.player2.selection = undefined;
+  await setGame(id, gameData);
 };

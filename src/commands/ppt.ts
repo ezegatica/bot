@@ -14,6 +14,7 @@ import {
   getGame,
   getName,
   getSoloPlayReply,
+  resetGame,
   setGame,
   updateGame
 } from '../utils/ppt';
@@ -97,11 +98,76 @@ module.exports = {
         if (guardRes) {
           return guardRes;
         }
-        const videoUrl = 'https://gatica.sirv.com/public/simpsons.gif';
-        return interaction.followUp({
-          content: 'Hagamos de cuenta que estamos jugando',
-          files: [{ attachment: videoUrl, name: 'imagination.gif' }]
-        });
+        if (gameData.player1.id === interaction.user.id) {
+          gameData.player1.selection = userSelection;
+        }
+        if (gameData.player2.id === interaction.user.id) {
+          gameData.player2.selection = userSelection;
+        }
+        await setGame(gameID, gameData);
+        if (gameData.player1.selection && gameData.player2.selection) {
+          const embed = new EmbedBuilder()
+            .setTitle('Piedra Papel o Tijera')
+            .addFields({
+              name: `${gameData.player1.username} eligió`,
+              value: getName(gameData.player1.selection),
+              inline: true
+            })
+            .addFields({
+              name: `${gameData.player2.username} eligió`,
+              value: getName(gameData.player2.selection),
+              inline: true
+            });
+          if (gameData.player1.selection === gameData.player2.selection) {
+            embed.addFields({ name: 'Resultado', value: 'Empate 😐' });
+            await updateGame(gameID, true, true);
+          } else if (
+            consultarGanador(
+              gameData.player1.selection,
+              gameData.player2.selection
+            )
+          ) {
+            embed.addFields({
+              name: 'Resultado',
+              value: `Ganó ${gameData.player1.username} 🎉`
+            });
+            await updateGame(gameID, true, false);
+          } else {
+            embed.addFields({
+              name: 'Resultado',
+              value: `Ganó ${gameData.player2.username} 🎉`
+            });
+            await updateGame(gameID, false, true);
+          }
+          const game = await getGame(gameID);
+          embed
+            .setFooter({
+              text: `${game.player1.username} (${game.player1.score}) vs ${game.player2.username} (${game.player2.score})`
+            })
+            .setDescription('Una nueva partida comenzará en 5 segundos...');
+          await interaction.editReply({
+            embeds: [embed],
+            components: []
+          });
+
+          // wait 5 seconds and start another game
+          await resetGame(game, gameID);
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          return interaction.editReply(getDuoPlayReply(game));
+        } else {
+          const reply = getDuoPlayReply(gameData);
+          const embed = reply.embeds[0];
+          if (gameData.player1.selection) {
+            embed.setDescription(`${gameData.player1.username} ya eligió`);
+          }
+          if (gameData.player2.selection) {
+            embed.setDescription(`${gameData.player2.username} ya eligió`);
+          }
+          return interaction.editReply({
+            embeds: [embed],
+            components: reply.components
+          });
+        }
       }
       case 'solo': {
         const gameData = await getGame(gameID, interaction);
