@@ -61,15 +61,19 @@ module.exports = {
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:wth'),
       new ButtonBuilder()
-        .setLabel('WinXP Startup')
+        .setLabel('Cri Cri')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:cricri'),
+      new ButtonBuilder()
+        .setLabel('XP Startup')
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:wxp2'),
       new ButtonBuilder()
-        .setLabel('WinXP Shutdown')
+        .setLabel('XP Shutdown')
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:wxp1'),
       new ButtonBuilder()
-        .setLabel('WinXP Error')
+        .setLabel('XP Error')
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:wxp3')
     );
@@ -78,6 +82,14 @@ module.exports = {
         .setLabel('Samsung')
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:samsung'),
+      new ButtonBuilder()
+        .setLabel('Bonk')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:bonk'),
+      new ButtonBuilder()
+        .setLabel('Ting')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:ting'),
       new ButtonBuilder()
         .setLabel('Ankara Messi')
         .setStyle(ButtonStyle.Secondary)
