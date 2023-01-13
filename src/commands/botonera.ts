@@ -15,6 +15,7 @@ import {
   SlashCommandBuilder
 } from 'discord.js';
 import { join } from 'path';
+import sonidos from '../utils/botonera';
 
 const Player = createAudioPlayer({
   behaviors: {
@@ -99,6 +100,16 @@ module.exports = {
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:gol')
     );
+    const botones4 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setLabel('Momo')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:momo'),
+      new ButtonBuilder()
+        .setLabel('Nonono wait')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:wait')
+    );
     const controles = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setLabel('Detener')
@@ -107,11 +118,15 @@ module.exports = {
       new ButtonBuilder()
         .setLabel('Andate')
         .setStyle(ButtonStyle.Primary)
-        .setCustomId('botonera:leave')
+        .setCustomId('botonera:leave'),
+      new ButtonBuilder()
+        .setLabel('Random')
+        .setStyle(ButtonStyle.Success)
+        .setCustomId('botonera:random')
     );
     return interaction.reply({
       embeds: [embed],
-      components: [botones, botones2, botones3, controles]
+      components: [botones, botones2, botones3, botones4, controles]
     });
   },
   async buttonExecute(interaction: ButtonInteraction) {
@@ -124,7 +139,7 @@ module.exports = {
         content: 'No estas en un canal de voz, unite y me uno!'
       });
     }
-    const choice = interaction.customId.split(':')[1];
+    let choice = interaction.customId.split(':')[1];
     if (choice === 'stop') {
       Player.stop();
       return i;
@@ -138,6 +153,10 @@ module.exports = {
       Player.stop();
       connection.destroy();
       return i;
+    }
+    if (choice === 'random') {
+      const randomSound = sonidos[Math.floor(Math.random() * sonidos.length)];
+      choice = randomSound;
     }
     const soundPath = join(process.cwd(), 'dist', 'assets', `${choice}.mp3`);
     connection.subscribe(Player);

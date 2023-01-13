@@ -1,0 +1,19 @@
+export default [
+  'ankara',
+  'bonk',
+  'boom',
+  'bruh',
+  'cricri',
+  'gol',
+  'goofy',
+  'laugh',
+  'momo',
+  'omg',
+  'samsung',
+  'ting',
+  'wait',
+  'wth',
+  'wxp1',
+  'wxp2',
+  'wxp3'
+];
