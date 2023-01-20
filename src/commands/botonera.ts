@@ -106,6 +106,14 @@ module.exports = {
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:momo'),
       new ButtonBuilder()
+        .setLabel('Tanto calor')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:calor'),
+      new ButtonBuilder()
+        .setLabel('Linda noche')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:noche'),
+      new ButtonBuilder()
         .setLabel('Nonono wait')
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:wait')
