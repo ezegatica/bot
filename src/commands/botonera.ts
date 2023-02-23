@@ -62,9 +62,9 @@ module.exports = {
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:wth'),
       new ButtonBuilder()
-        .setLabel('Cri Cri')
+        .setLabel('Outro')
         .setStyle(ButtonStyle.Secondary)
-        .setCustomId('botonera:cricri'),
+        .setCustomId('botonera:outro'),
       new ButtonBuilder()
         .setLabel('XP Startup')
         .setStyle(ButtonStyle.Secondary)
@@ -92,19 +92,23 @@ module.exports = {
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:ting'),
       new ButtonBuilder()
+        .setLabel('Pedo')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:fart'),
+      new ButtonBuilder()
+        .setLabel('Violin')
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId('botonera:violin')
+    );
+    const botones4 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
         .setLabel('Ankara Messi')
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:ankara'),
       new ButtonBuilder()
         .setLabel('Golgolgol')
         .setStyle(ButtonStyle.Secondary)
-        .setCustomId('botonera:gol')
-    );
-    const botones4 = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setLabel('Momo')
-        .setStyle(ButtonStyle.Secondary)
-        .setCustomId('botonera:momo'),
+        .setCustomId('botonera:gol'),
       new ButtonBuilder()
         .setLabel('Tanto calor')
         .setStyle(ButtonStyle.Secondary)
