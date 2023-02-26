@@ -26,7 +26,6 @@ jobs:
           screen -dmS discord
           screen -S discord -X stuff "cd /home/ec2-user/bot-cicd
           yarn install --frozen-lockfile --production
-          yarn stop:all
-          yarn start
+          yarn reload
           "
              
