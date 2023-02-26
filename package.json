@@ -9,7 +9,7 @@
     "build": "tsc",
     "prebuild": "rimraf dist",
     "postbuild": "node dist/postbuild",
-    "start": "forever start --uid discord dist/index.js",
+    "start": "forever start dist/index.js",
     "stop": "forever stop discord",
     "stop:all": "forever stopall",
     "register": "node dist/deploy-commands.js",
