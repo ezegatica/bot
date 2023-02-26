@@ -13,7 +13,7 @@
     "dev:register": "ts-node src/deploy-commands.ts",
     "lint:eslint": "eslint \"src/**/*.ts\" --fix",
     "lint:prettier": "prettier . --write",
-    "start": "pm2 start dist/index.js --name discord --output ./logs/output.txt --error ./logs/errors.txt -i max",
+    "start": "pm2 start",
     "dev": "nodemon --exec ts-node src/index.ts",
     "reload": "pm2 reload discord",
     "stop": "pm2 stop discord",

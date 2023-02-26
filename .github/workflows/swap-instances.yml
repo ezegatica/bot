@@ -21,11 +21,11 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         username: ec2-user
         script: |
-          cp /home/ec2-user/.env /home/ec2-user/bot-cicd/.env
+          cp /home/ec2-user/.env /home/ec2-user/bot/.env
           screen -S discord -X quit
           screen -dmS discord
-          screen -S discord -X stuff "cd /home/ec2-user/bot-cicd
+          screen -S discord -X stuff "cd /home/ec2-user/bot
           yarn install --frozen-lockfile --production
-          yarn reload
+          yarn reload || yarn start
           "
              
