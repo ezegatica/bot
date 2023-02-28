@@ -62,9 +62,9 @@ module.exports = {
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:wth'),
       new ButtonBuilder()
-        .setLabel('Outro')
+        .setLabel('Ze Blootoos')
         .setStyle(ButtonStyle.Secondary)
-        .setCustomId('botonera:outro'),
+        .setCustomId('botonera:zebluetooth'),
       new ButtonBuilder()
         .setLabel('XP Startup')
         .setStyle(ButtonStyle.Secondary)
@@ -88,9 +88,9 @@ module.exports = {
         .setStyle(ButtonStyle.Secondary)
         .setCustomId('botonera:bonk'),
       new ButtonBuilder()
-        .setLabel('Ting')
+        .setLabel('Me pican los cocos')
         .setStyle(ButtonStyle.Secondary)
-        .setCustomId('botonera:ting'),
+        .setCustomId('botonera:cocos'),
       new ButtonBuilder()
         .setLabel('Pedo')
         .setStyle(ButtonStyle.Secondary)
