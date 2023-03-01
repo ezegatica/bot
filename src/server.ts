@@ -41,7 +41,7 @@ app.listen(port, () => {
 });
 
 function readFile(file: string, res: express.Response, page: number): void {
-  const pageSize = 5;
+  const pageSize = 50;
   const filePath = path.join(__dirname, `../logs/${file}.log`);
   const streamPath = path.join(__dirname, `../logs/${file}.stream`);
   const instream = fs.createReadStream(filePath);
@@ -67,7 +67,8 @@ function readFile(file: string, res: express.Response, page: number): void {
         timestamp: r.timestamp
       })),
       page: currentPage,
-      totalPages
+      totalPages,
+      totalLogs: arr.length
     });
   });
 }
