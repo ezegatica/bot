@@ -68,7 +68,8 @@ function readFile(file: string, res: express.Response, page: number): void {
       })),
       page: currentPage,
       totalPages,
-      totalLogs: arr.length
+      totalLogs: arr.length,
+      perPage: pageSize
     });
   });
 }
