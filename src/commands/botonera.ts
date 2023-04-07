@@ -144,7 +144,7 @@ module.exports = {
   async buttonExecute(interaction: ButtonInteraction) {
     const i = await interaction.deferUpdate();
     const vcId = interaction.guild.members.cache.get(interaction.user.id).voice
-      .channelId;
+      ?.channelId;
     if (!vcId) {
       return interaction.followUp({
         ephemeral: true,

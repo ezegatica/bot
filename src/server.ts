@@ -40,7 +40,11 @@ app.listen(port, () => {
   Logger.step(`http://localhost:${port}`);
 });
 
-function readFile(file: string, res: express.Response, page: number): void {
+function readFile(
+  file: 'error-0' | 'out-0',
+  res: express.Response,
+  page: number
+): void {
   const pageSize = 50;
   const filePath = path.join(__dirname, `../logs/${file}.log`);
   const streamPath = path.join(__dirname, `../logs/${file}.stream`);
@@ -50,7 +54,13 @@ function readFile(file: string, res: express.Response, page: number): void {
   const arr: Log[] = [];
 
   rl.on('line', line => {
-    arr.unshift(JSON.parse(line));
+    arr.unshift({
+      app_name: 'discord',
+      message: line,
+      process_id: 0,
+      timestamp: new Date(),
+      type: file === 'error-0' ? 'error' : 'out'
+    });
   });
 
   rl.on('close', () => {
