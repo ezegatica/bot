@@ -54,6 +54,9 @@ function readFile(
   const arr: Log[] = [];
 
   rl.on('line', line => {
+    if (file === 'out-0') {
+      return arr.unshift(JSON.parse(line));
+    }
     arr.unshift({
       app_name: 'discord',
       message: line,
